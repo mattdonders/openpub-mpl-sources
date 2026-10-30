@@ -1,0 +1,21 @@
+Expose the Publisher text-story id on each text object.
+
+libmspub writes the whole story into every frame of a chain of connected text
+boxes. Without knowing which frames share a story, a renderer draws the full text
+in each frame. This passes ShapeInfo::m_textId through as the
+"librevenge:mspub-text-id" property, so OpenPub can flow the story across the
+chain. It is an additive property; generators that don't know it ignore it.
+
+diff --git a/src/lib/MSPUBCollector.cpp b/src/lib/MSPUBCollector.cpp
+index f83ed22..250edc8 100644
+--- a/src/lib/MSPUBCollector.cpp
++++ b/src/lib/MSPUBCollector.cpp
+@@ -1221,6 +1221,8 @@ std::function<void(void)> MSPUBCollector::paintShape(const ShapeInfo &info, cons
+         if (ngap > 0)
+           props.insert("fo:column-gap", (double)ngap / EMUS_IN_INCH);
+       }
++      if (bool(info.m_textId))
++        props.insert("librevenge:mspub-text-id", (int)get(info.m_textId));
+       m_painter->startTextObject(props);
+       for (const auto &line : text)
+       {
