@@ -1,0 +1,18 @@
+MSVC: define the POSIX S_ISREG/S_ISDIR macros, which the Windows CRT <sys/stat.h> lacks.
+
+diff --git a/src/lib/RVNGDirectoryStream.cpp b/src/lib/RVNGDirectoryStream.cpp
+index 1cf4b76..9f693c9 100644
+--- a/src/lib/RVNGDirectoryStream.cpp
++++ b/src/lib/RVNGDirectoryStream.cpp
+@@ -27,6 +27,11 @@
+ #include <vector>
+ #include <boost/algorithm/string.hpp>
+ 
++#if defined(_MSC_VER) && !defined(S_ISREG)
++#define S_ISREG(m) (((m) & _S_IFMT) == _S_IFREG)
++#define S_ISDIR(m) (((m) & _S_IFMT) == _S_IFDIR)
++#endif
++
+ namespace librevenge
+ {
+ 
